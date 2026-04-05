@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codefabric_laravel_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "4000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - codefabric_laravel_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: codefabric_laravel_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - codefabric_laravel_net
+
+networks:
+  codefabric_laravel_net:
+    name: codefabric_laravel_net

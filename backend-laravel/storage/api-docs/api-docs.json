@@ -1,0 +1,378 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "CodeFabric Admin API",
+        "description": "CodeFabric 管理后台后端接口文档（Laravel 13）",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:4000",
+            "description": "本地开发环境"
+        }
+    ],
+    "paths": {
+        "/api/admin/auth/login": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "登录。",
+                "description": "管理员登录，成功后写入 admin_token Cookie",
+                "operationId": "adminAuthLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthLoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "登录成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessEnvelope"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "用户名或密码错误",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorEnvelope"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/auth/me": {
+            "get": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "获取当前登录信息。",
+                "description": "获取当前登录用户及权限包",
+                "operationId": "adminAuthMe",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessEnvelope"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorEnvelope"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    },
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/auth/logout": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "退出登录。",
+                "description": "退出登录并清理鉴权 Cookie",
+                "operationId": "adminAuthLogout",
+                "responses": {
+                    "200": {
+                        "description": "退出成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiEnvelope"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    },
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/auth/change-password": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "修改密码。",
+                "description": "修改当前用户密码",
+                "operationId": "adminAuthChangePassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthChangePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "修改成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiEnvelope"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "原密码不正确",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorEnvelope"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiErrorEnvelope"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    },
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthLoginRequest": {
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "username": {
+                        "description": "认证模块文档组件定义。",
+                        "type": "string",
+                        "example": "admin",
+                        "maxLength": 50
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "123456",
+                        "maxLength": 100,
+                        "minLength": 6
+                    }
+                },
+                "type": "object"
+            },
+            "AuthChangePasswordRequest": {
+                "required": [
+                    "oldPassword",
+                    "newPassword"
+                ],
+                "properties": {
+                    "oldPassword": {
+                        "type": "string",
+                        "example": "123456",
+                        "maxLength": 100,
+                        "minLength": 6
+                    },
+                    "newPassword": {
+                        "type": "string",
+                        "example": "new_123456",
+                        "maxLength": 100,
+                        "minLength": 6
+                    }
+                },
+                "type": "object"
+            },
+            "AuthPermissionBundle": {
+                "properties": {
+                    "user": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "menus": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AuthSuccessEnvelope": {
+                "required": [
+                    "code",
+                    "message",
+                    "data"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/AuthPermissionBundle"
+                    }
+                },
+                "type": "object"
+            },
+            "ApiEnvelope": {
+                "required": [
+                    "code",
+                    "message",
+                    "data"
+                ],
+                "properties": {
+                    "code": {
+                        "description": "CodeFabric 后端 OpenAPI 根定义。\n\n说明：\n- 使用 swagger-php Attributes 维护接口文档。\n- 业务返回统一为 { code, message, data }，通过组件 Schema 复用。",
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "data": {
+                        "nullable": true,
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "ApiErrorEnvelope": {
+                "required": [
+                    "code",
+                    "message",
+                    "data"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "example": 2004
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "请求失败"
+                    },
+                    "data": {
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "在 Authorization 请求头中传入 Bearer Token",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "cookieAuth": {
+                "type": "apiKey",
+                "description": "浏览器 Cookie 鉴权",
+                "name": "admin_token",
+                "in": "cookie"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "认证管理",
+            "description": "登录、登出、登录态获取与密码修改"
+        }
+    ]
+}
