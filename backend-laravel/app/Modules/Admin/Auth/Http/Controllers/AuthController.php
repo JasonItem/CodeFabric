@@ -14,7 +14,6 @@ use App\Modules\Admin\Auth\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 use Spatie\RouteAttributes\Attributes\Get;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
@@ -38,8 +37,7 @@ final class AuthController extends ApiController
     /**
      * 登录。
      */
-    #[Post('login')]
-    #[Middleware('throttle:admin-login')]
+    #[Post('login', middleware: 'throttle:admin-login')]
     #[ApiAuth(loginRequired: false)]
     #[OperationLog(module: '认证管理', action: '登录')]
     #[OA\Post(
